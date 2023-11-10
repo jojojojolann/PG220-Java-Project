@@ -38,7 +38,7 @@ public class Matrice {
     public String isValid(String word) {
     	StringBuilder result = new StringBuilder();
     	
-    	for (int i = 1; i < word.length(); i++) {
+    	for (int i = 0; i < word.length(); i++) {
     		if (word.charAt(i) == Solution.charAt(i)) { // Correct + Good place
     			result.append("A ");
     		}
@@ -54,15 +54,45 @@ public class Matrice {
     
     public void addTry(String word, int idxRow) {
     	String Test = isValid(word);
-        if (((Test.indexOf("C") == -1) || (Test.indexOf("B") == -1)) && (idxRow < maxTry)) {
+        if (!((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry))) {
             for (int i = 0; i < wordLen; i++) {
-                matrice[idxRow][i] = word.charAt(i);
+                matrice[this.idxRow][i] = word.charAt(i);
             }
             idxRow++;
-        }
-        else {
-        	// Game Over :(
-        	// Wanna start again ?
+            
+            // End of game
+            if (word.equals(Solution)) {
+                System.out.println("Félicitations ! Vous avez trouvé le mot !");
+            } else if (this.idxRow == maxTry) {
+            	System.out.println("Game Over. Vous avez épuisé toutes vos tentatives.");
+                System.out.println("Le mot correct était : " + Solution);
+            }
+        } else {
+        	System.out.println("Essai invalide. Veuillez réessayer.");
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
