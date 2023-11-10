@@ -183,5 +183,3 @@ public class MotusFrame {
         SwingUtilities.invokeLater(MotusFrame::new);
     }
 }
-
-
