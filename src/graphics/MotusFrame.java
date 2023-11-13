@@ -4,6 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MotusFrame {
 
@@ -14,9 +18,11 @@ public class MotusFrame {
     private Timer timer;
     private JLabel timerLabel;
     private int elapsedTime;
+    private Map<Character, JButton> keyboardButtons;
 
-    private static final int MIN_GRID_SIZE = 5;
-    private static final int MAX_GRID_SIZE = 10;
+    public static final int MIN_GRID_SIZE = 5;
+    public static final int MAX_GRID_SIZE = 10;
+    public static final char INITIAL_LETTER = 'A';
 
     public MotusFrame() {
         createInitialFrame();
@@ -60,8 +66,11 @@ public class MotusFrame {
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.PAGE_AXIS));
         setupControlPanel(controlPanel);
 
+        JPanel keyboardPanel = createKeyboardPanel();
+
         gameFrame.add(panel, BorderLayout.CENTER);
         gameFrame.add(controlPanel, BorderLayout.EAST);
+        gameFrame.add(keyboardPanel, BorderLayout.SOUTH);
 
         int cellSize = 50;
         int windowWidth = size * cellSize + 200;
@@ -75,22 +84,56 @@ public class MotusFrame {
 
     private void setupGrid() {
         KeyAdapter keyAdapter = createKeyAdapter();
+        Font gridFont = new Font("SansSerif", Font.BOLD, 20);
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                textFields[i][j] = new JTextField();
-                textFields[i][j].setHorizontalAlignment(JTextField.CENTER);
-                textFields[i][j].addKeyListener(keyAdapter);
-                panel.add(textFields[i][j]);
+                JTextField textField = new JTextField();
+                textField.setHorizontalAlignment(JTextField.CENTER);
+                textField.setFont(gridFont);
+                textField.setBackground(new Color(255, 255, 255));
+                textField.setForeground(new Color(0, 0, 0));
+                textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                textField.addKeyListener(keyAdapter);
+
+                if (j == 0) {
+                    textField.setText(String.valueOf(INITIAL_LETTER));
+                    textField.setEditable(false);
+                }
+
+                textFields[i][j] = textField;
+                panel.add(textField);
             }
         }
+
+        SwingUtilities.invokeLater(() -> textFields[0][1].requestFocus());
+    }
+
+    private JPanel createKeyboardPanel() {
+        String[] keys = {"AZERTYUIOP", "QSDFGHJKLM", "<WXCVBN>?"};
+        JPanel keyboardPanel = new JPanel();
+        keyboardPanel.setLayout(new GridLayout(3, 1));
+        keyboardButtons = new HashMap<>();
+
+        for (String keyRow : keys) {
+            JPanel rowPanel = new JPanel(new FlowLayout());
+            for (char key : keyRow.toCharArray()) {
+                JButton keyButton = new JButton(String.valueOf(key));
+                keyButton.setEnabled(false);
+                rowPanel.add(keyButton);
+                keyboardButtons.put(key, keyButton);
+            }
+            keyboardPanel.add(rowPanel);
+        }
+
+        return keyboardPanel;
     }
 
     private KeyAdapter createKeyAdapter() {
         return new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 JTextField source = (JTextField) e.getSource();
-                if (source.getText().length() >= 1) {
+                if (source.getText().length() >= 1 && e.getKeyChar() != KeyEvent.VK_BACK_SPACE) {
                     e.consume();
                 }
             }
@@ -98,10 +141,12 @@ public class MotusFrame {
             public void keyPressed(KeyEvent e) {
                 JTextField source = (JTextField) e.getSource();
                 if (Character.isLetter(e.getKeyChar())) {
-                    source.setText(String.valueOf(e.getKeyChar()));
+                    source.setText(String.valueOf(Character.toUpperCase(e.getKeyChar())));
                     moveFocusRight(source);
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     moveFocusDown(source);
+                } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                    handleBackspace(source);
                 }
             }
         };
@@ -133,7 +178,7 @@ public class MotusFrame {
         }
 
         boolean allFilled = true;
-        for (int j = 0; j < size; j++) {
+        for (int j = 1; j < size; j++) { // Start at 1, as 0 is pre-filled
             if (textFields[currentRow][j].getText().trim().isEmpty()) {
                 allFilled = false;
                 break;
@@ -141,7 +186,45 @@ public class MotusFrame {
         }
 
         if (allFilled && currentRow < size - 1) {
-            textFields[currentRow + 1][0].requestFocus();
+            colorRow(currentRow);
+            updateKeyboard(currentRow);
+            textFields[currentRow + 1][1].requestFocus();
+        }
+    }
+    
+    private void handleBackspace(JTextField currentField) {
+        int row = -1, col = -1;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (textFields[i][j] == currentField) {
+                    row = i;
+                    col = j;
+                    break;
+                }
+            }
+            if (row != -1) break;
+        }
+
+        if (col > 1) { // S'arrête à la deuxième case (index 1)
+            textFields[row][col - 1].requestFocus();
+        }
+    }
+
+    private void colorRow(int rowIndex) {
+        Color completedRowColor = new Color(200, 200, 200);
+        for (int j = 0; j < size; j++) {
+            textFields[rowIndex][j].setBackground(completedRowColor);
+        }
+    }
+
+    private void updateKeyboard(int currentRow) {
+        for (int j = 1; j < size; j++) {
+            char letter = textFields[currentRow][j].getText().toUpperCase().charAt(0);
+            if (keyboardButtons.containsKey(letter)) {
+                JButton keyButton = keyboardButtons.get(letter);
+                keyButton.setEnabled(false);
+                keyButton.setBackground(Color.GRAY);
+            }
         }
     }
 
@@ -172,14 +255,23 @@ public class MotusFrame {
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                textFields[i][j].setText("");
+                textFields[i][j].setText(j == 0 ? String.valueOf(INITIAL_LETTER) : "");
+                textFields[i][j].setBackground(Color.WHITE);
+                textFields[i][j].setEditable(j != 0);
             }
         }
 
+        for (JButton keyButton : keyboardButtons.values()) {
+            keyButton.setEnabled(false);
+            keyButton.setBackground(null);
+        }
+
         timer.start();
+        textFields[0][1].requestFocus();
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MotusFrame::new); // Louis
+    	MotusFrame h = new MotusFrame();
     }
 }
+
