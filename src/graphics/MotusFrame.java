@@ -180,6 +180,6 @@ public class MotusFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MotusFrame::new);
+        SwingUtilities.invokeLater(MotusFrame::new); // Louis
     }
 }
