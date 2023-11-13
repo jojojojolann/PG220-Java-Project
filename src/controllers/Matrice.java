@@ -60,7 +60,7 @@ public class Matrice {
             }
             idxRow++;
             
-            // End of game
+            // End of game de
             if (word.equals(Solution)) {
                 System.out.println("Félicitations ! Vous avez trouvé le mot !");
             } else if (this.idxRow == maxTry) {
@@ -72,25 +72,6 @@ public class Matrice {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
