@@ -55,7 +55,7 @@ public class Matrice {
     
     public void addTry(String word, int idxRow) {
     	String Test = isValid(word);
-        if ((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry)) {
+        if ((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry-1)) {
             for (int i = 0; i < wordLen-1; i++) {
                 matrice[this.idxRow][i] = word.charAt(i);
             }
@@ -63,20 +63,13 @@ public class Matrice {
             System.out.println("idxRow = " + idxRow);
             System.out.println("Word : " + word);
             
-            // End of game de
-            if (word.equals(Solution)) {
-                System.out.println("Félicitations ! Vous avez trouvé le mot !");
-            } else if ((this.idxRow == maxTry-1) && (!(word.equals(Solution)))) {
-            	System.out.println("Game Over. Vous avez épuisé toutes vos tentatives.");
-                System.out.println("Le mot correct était : " + Solution);
-            }
-        } else {
-        	System.out.println("Essai invalide. Veuillez réessayer.");
+        } // End of game de
+        else if ((Test.contains("C") || (Test.contains("B"))) && (idxRow == maxTry-1)) {
+        	System.out.println("Game Over. Vous avez épuisé toutes vos tentatives.");
+            System.out.println("Le mot correct était : " + Solution);
+        }
+        else {
+        	System.out.println("Félicitations ! Vous avez trouvé le mot !");
         }
     }
 }
-
-
-
-
-
