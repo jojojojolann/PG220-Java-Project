@@ -219,13 +219,24 @@ public class MotusFrame {
                     source.setText(String.valueOf(Character.toUpperCase(e.getKeyChar())));
                     moveFocusRight(source);
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                	submitWord(source);
-                    moveFocusDown(source);
+                	if (isRowComplete(getCurrentRow(source))) {
+                        submitWord(source);
+                        moveFocusDown(source);
+                    }
                 } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                     handleBackspace(source);
                 }
             }
         };
+    }
+    
+    private boolean isRowComplete(int rowIndex) {
+        for (int col = 0; col < size; col++) {
+            if (textFields[rowIndex][col].getText().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
     
     private void submitWord(JTextField source) {
