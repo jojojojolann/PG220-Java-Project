@@ -4,10 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.HashMap;
 import java.util.Map;
+
+import controllers.Dictionnary;
 
 public class MotusFrame {
 
@@ -19,12 +25,14 @@ public class MotusFrame {
     private JLabel timerLabel;
     private int elapsedTime;
     private Map<Character, JButton> keyboardButtons;
+    private Dictionnary dictionnary;
 
     public static final int MIN_GRID_SIZE = 5;
     public static final int MAX_GRID_SIZE = 10;
-    public static final char INITIAL_LETTER = 'A';
+    public static char INITIAL_LETTER = 'A'; // Rendre non final pour pouvoir le modifier
 
     public MotusFrame() {
+        dictionnary = new Dictionnary(); // Initialisation de Dictionnary
         createInitialFrame();
     }
 
@@ -40,10 +48,14 @@ public class MotusFrame {
 
         JComboBox<Integer> gridSizes = new JComboBox<>(sizeOptions);
         JButton submitButton = new JButton("Start Game");
-        submitButton.addActionListener(e -> {
-            size = (int) gridSizes.getSelectedItem();
-            createAndShowGameGUI();
-            initialFrame.dispose();
+        submitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                size = (int) gridSizes.getSelectedItem();
+                String selectedWord = dictionnary.motaleatoire(size); // Utiliser Dictionnary pour obtenir un mot
+                INITIAL_LETTER = selectedWord.toUpperCase().charAt(0); // Définir la première lettre
+                createAndShowGameGUI();
+                initialFrame.dispose();
+            }
         });
 
         initialFrame.add(gridSizes);
@@ -52,6 +64,7 @@ public class MotusFrame {
         initialFrame.setLocationRelativeTo(null);
         initialFrame.setVisible(true);
     }
+
 
     private void createAndShowGameGUI() {
         gameFrame = new JFrame("Motus Game");
@@ -88,7 +101,7 @@ public class MotusFrame {
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                JTextField textField = new JTextField();
+                final JTextField textField = new JTextField();
                 textField.setHorizontalAlignment(JTextField.CENTER);
                 textField.setFont(gridFont);
                 textField.setBackground(new Color(255, 255, 255));
@@ -96,8 +109,18 @@ public class MotusFrame {
                 textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                 textField.addKeyListener(keyAdapter);
 
+                // Empêcher la sélection de texte avec la souris
+                textField.addMouseListener(new MouseAdapter() {
+                    public void mousePressed(MouseEvent e) {
+                        textField.setFocusable(false);
+                    }
+                    public void mouseReleased(MouseEvent e) {
+                        textField.setFocusable(true);
+                    }
+                });
+
                 if (j == 0) {
-                    textField.setText(String.valueOf(INITIAL_LETTER));
+                    textField.setText(String.valueOf(INITIAL_LETTER)); // Afficher la première lettre du mot
                     textField.setEditable(false);
                 }
 
@@ -106,8 +129,15 @@ public class MotusFrame {
             }
         }
 
-        SwingUtilities.invokeLater(() -> textFields[0][1].requestFocus());
+        // Activer le focus pour le premier champ de saisie
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                textFields[0][1].requestFocusInWindow();
+            }
+        });
     }
+
+
 
     private JPanel createKeyboardPanel() {
         String[] keys = {"AZERTYUIOP", "QSDFGHJKLM", "<WXCVBN>?"};
@@ -178,7 +208,7 @@ public class MotusFrame {
         }
 
         boolean allFilled = true;
-        for (int j = 1; j < size; j++) { // Start at 1, as 0 is pre-filled
+        for (int j = 1; j < size; j++) {
             if (textFields[currentRow][j].getText().trim().isEmpty()) {
                 allFilled = false;
                 break;
@@ -205,7 +235,7 @@ public class MotusFrame {
             if (row != -1) break;
         }
 
-        if (col > 1) { // S'arrête à la deuxième case (index 1)
+        if (col > 1) { // S'arrête à la deuxième case
             textFields[row][col - 1].requestFocus();
         }
     }
@@ -231,22 +261,36 @@ public class MotusFrame {
     private void setupControlPanel(JPanel controlPanel) {
         elapsedTime = 0;
         timerLabel = new JLabel("Temps: 0 s");
-        timer = new Timer(1000, e -> {
-            elapsedTime++;
-            timerLabel.setText("Temps: " + elapsedTime + " s");
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                elapsedTime++;
+                timerLabel.setText("Temps: " + elapsedTime + " s");
+            }
         });
         timer.start();
 
         JButton restartButton = new JButton("Recommencer");
-        restartButton.addActionListener(e -> restartGame());
+        restartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                restartGame();
+            }
+        });
 
         JButton quitButton = new JButton("Quitter");
-        quitButton.addActionListener(e -> System.exit(0));
+        quitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
 
         controlPanel.add(timerLabel);
         controlPanel.add(restartButton);
         controlPanel.add(quitButton);
     }
+
 
     private void restartGame() {
         timer.stop();
@@ -274,4 +318,3 @@ public class MotusFrame {
     	MotusFrame h = new MotusFrame();
     }
 }
-
