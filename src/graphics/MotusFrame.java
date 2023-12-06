@@ -301,6 +301,9 @@ public class MotusFrame {
                 if (textFields[i][j] == currentField) {
                     row = i;
                     col = j;
+                    if (j == indice) {
+                    	textFields[i][j].setText(String.valueOf(SECOND_LETTER));
+                    }
                     break;
                 }
             }
