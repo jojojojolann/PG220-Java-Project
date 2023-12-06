@@ -333,27 +333,10 @@ public class MotusFrame {
         controlPanel.add(quitButton);
     }
 
-
     private void restartGame() {
         timer.stop();
-        elapsedTime = 0;
-        timerLabel.setText("Temps: 0 s");
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                textFields[i][j].setText(j == 0 ? String.valueOf(INITIAL_LETTER) : "");
-                textFields[i][j].setBackground(Color.WHITE);
-                textFields[i][j].setEditable(j != 0);
-            }
-        }
-
-        for (JButton keyButton : keyboardButtons.values()) {
-            keyButton.setEnabled(false);
-            keyButton.setBackground(null);
-        }
-
-        timer.start();
-        textFields[0][1].requestFocus();
+        gameFrame.dispose();
+        createInitialFrame();
     }
 
     public static void main(String[] args) {
