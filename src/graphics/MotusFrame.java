@@ -1,5 +1,7 @@
 package graphics;
 
+import controllers.Dictionnary;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -29,7 +31,11 @@ public class MotusFrame {
 
     public static final int MIN_GRID_SIZE = 5;
     public static final int MAX_GRID_SIZE = 10;
+<<<<<<< HEAD
     public static char INITIAL_LETTER = 'A'; // Rendre non final pour pouvoir le modifier
+=======
+    public char INITIAL_LETTER = 'A';
+>>>>>>> 030125d6ddf1e6165a6e7c989da39abc625b612b
 
     public MotusFrame() {
         dictionnary = new Dictionnary(); // Initialisation de Dictionnary
@@ -37,7 +43,7 @@ public class MotusFrame {
     }
 
     private void createInitialFrame() {
-        initialFrame = new JFrame("Select Grid Size");
+        /*initialFrame = new JFrame("Select Grid Size");
         initialFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initialFrame.setLayout(new FlowLayout());
 
@@ -62,7 +68,16 @@ public class MotusFrame {
         initialFrame.add(submitButton);
         initialFrame.pack();
         initialFrame.setLocationRelativeTo(null);
-        initialFrame.setVisible(true);
+        initialFrame.setVisible(true);*/
+    	Dictionnary aie = new Dictionnary();
+		size = aie.size_choice();
+		String mot = aie.motaleatoire(size);
+		String motMaj = mot.toUpperCase();
+		INITIAL_LETTER = motMaj.charAt(0);
+		
+		// Choix aléatoire de la deuxième lettre
+		
+		createAndShowGameGUI();
     }
 
 

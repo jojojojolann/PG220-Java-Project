@@ -19,7 +19,7 @@ public class Dictionnary {
 	
 	public ArrayList<String> creadico(){
 		ArrayList<String> ar = new ArrayList<>();
-		try (FileInputStream fichier = new FileInputStream("Dictionnaire.txt"); Scanner scanner = new Scanner(fichier)) {
+		try (FileInputStream fichier = new FileInputStream("Doc.txt"); Scanner scanner = new Scanner(fichier)) {
 				while(scanner.hasNextLine()) {
 					ar.add(scanner.nextLine());
 				}
@@ -31,19 +31,24 @@ public class Dictionnary {
 		
 	
 	public String motaleatoire(int taille) {
-		ArrayList<String> list = new ArrayList<>();
-		for(int i = 0; i < dico.size(); i++) {
-			int line = dico.get(i).length();
-			if (line == taille) {
-				list.add(dico.get(i));
-			}
-		}
-		Random r2 = new Random();
-		int n = r2.nextInt(list.size());
+        ArrayList<String> list = new ArrayList<>();
+        for (String mot : dico) {
+            if (mot.length() == taille) {
+                list.add(mot);
+            }
+        }
+        
+        if (list.isEmpty()) {
+            System.out.println("Aucun mot de la taille " + taille + " n'a été trouvé dans le dictionnaire.");
+            return "";
+        }
+
+        Random r2 = new Random();
+        int n = r2.nextInt(list.size());
         String mot = list.get(n);
-		System.out.println("Le mot de taille "+taille+" choisit est : " + mot ); 
-		return mot;
-	}
+        System.out.println("Le mot de taille "+ taille +" choisi est : " + mot); 
+        return mot;
+    }
 	
 	public int minimum() {
 		int min = 1000;
