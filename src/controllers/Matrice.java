@@ -26,6 +26,10 @@ public class Matrice {
 		this.idxRow = idxRow;
 	}
 	
+	public String getSolution() {
+		return Solution;
+	}
+	
 	// Methods
     public void display() {
         for (int i = 0; i < maxTry; i++) {
