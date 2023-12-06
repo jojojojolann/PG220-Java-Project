@@ -1,7 +1,5 @@
 package graphics;
 
-import controllers.Dictionnary;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -14,6 +12,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import controllers.Dictionnary;
 
@@ -29,56 +28,79 @@ public class MotusFrame {
     private Map<Character, JButton> keyboardButtons;
     private Dictionnary dictionnary;
 
-    public static final int MIN_GRID_SIZE = 5;
-    public static final int MAX_GRID_SIZE = 10;
-<<<<<<< HEAD
-    public static char INITIAL_LETTER = 'A'; // Rendre non final pour pouvoir le modifier
-=======
-    public char INITIAL_LETTER = 'A';
->>>>>>> 030125d6ddf1e6165a6e7c989da39abc625b612b
+    public static final int MIN_GRID_SIZE = 7;
+    public static final int MAX_GRID_SIZE = 15;
+    public static char INITIAL_LETTER;
+    public static char SECOND_LETTER;
+    public String selectedWord;
+    public int indice;
 
     public MotusFrame() {
-        dictionnary = new Dictionnary(); // Initialisation de Dictionnary
+        dictionnary = new Dictionnary();
         createInitialFrame();
     }
 
     private void createInitialFrame() {
-        /*initialFrame = new JFrame("Select Grid Size");
+        initialFrame = new JFrame("Select Grid Size");
         initialFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        initialFrame.setLayout(new FlowLayout());
+        initialFrame.setLayout(new BoxLayout(initialFrame.getContentPane(), BoxLayout.PAGE_AXIS));
 
+        // Ligne 1: Choix de la taille du mot
+        JPanel sizePanel = new JPanel(new FlowLayout());
         Integer[] sizeOptions = new Integer[MAX_GRID_SIZE - MIN_GRID_SIZE + 1];
         for (int i = 0; i < sizeOptions.length; i++) {
             sizeOptions[i] = MIN_GRID_SIZE + i;
         }
-
         JComboBox<Integer> gridSizes = new JComboBox<>(sizeOptions);
+        sizePanel.add(new JLabel("Taille du mot :"));
+        sizePanel.add(gridSizes);
+
+        // Ligne 2: Choix de l'affichage de la deuxième lettre aléatoire
+        JPanel letterChoicePanel = new JPanel(new FlowLayout());
+        JRadioButton yesButton = new JRadioButton("Oui", true);
+        JRadioButton noButton = new JRadioButton("Non");
+        ButtonGroup group = new ButtonGroup();
+        group.add(yesButton);
+        group.add(noButton);
+        letterChoicePanel.add(new JLabel("Afficher une deuxième lettre aléatoire :"));
+        letterChoicePanel.add(yesButton);
+        letterChoicePanel.add(noButton);
+
+        // Ligne 3: Bouton de démarrage du jeu
+        JPanel startGamePanel = new JPanel(new FlowLayout());
         JButton submitButton = new JButton("Start Game");
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 size = (int) gridSizes.getSelectedItem();
-                String selectedWord = dictionnary.motaleatoire(size); // Utiliser Dictionnary pour obtenir un mot
-                INITIAL_LETTER = selectedWord.toUpperCase().charAt(0); // Définir la première lettre
+                selectedWord = dictionnary.motaleatoire(size);
+                selectedWord = selectedWord.toUpperCase();
+                INITIAL_LETTER = selectedWord.charAt(0);
+
+                // Choix aléatoire de la deuxième lettre si "Oui" est sélectionné
+                if (yesButton.isSelected()) {
+                    indice = new Random().nextInt(size-1);
+                    indice += 1;
+                    SECOND_LETTER = selectedWord.charAt(indice);
+                } else {
+                    indice = -1; // Valeur pour indiquer que la deuxième lettre ne doit pas être affichée
+                }
+
                 createAndShowGameGUI();
                 initialFrame.dispose();
             }
         });
+        startGamePanel.add(submitButton);
 
-        initialFrame.add(gridSizes);
-        initialFrame.add(submitButton);
+        // Ajout des panneaux à la fenêtre principale
+        initialFrame.add(sizePanel);
+        initialFrame.add(letterChoicePanel);
+        initialFrame.add(startGamePanel);
+
         initialFrame.pack();
         initialFrame.setLocationRelativeTo(null);
-        initialFrame.setVisible(true);*/
-    	Dictionnary aie = new Dictionnary();
-		size = aie.size_choice();
-		String mot = aie.motaleatoire(size);
-		String motMaj = mot.toUpperCase();
-		INITIAL_LETTER = motMaj.charAt(0);
-		
-		// Choix aléatoire de la deuxième lettre
-		
-		createAndShowGameGUI();
+        initialFrame.setVisible(true);
     }
+
 
 
     private void createAndShowGameGUI() {
@@ -134,8 +156,14 @@ public class MotusFrame {
                     }
                 });
 
+                // Afficher la première lettre dans la première colonne
                 if (j == 0) {
-                    textField.setText(String.valueOf(INITIAL_LETTER)); // Afficher la première lettre du mot
+                    textField.setText(String.valueOf(INITIAL_LETTER));
+                    textField.setEditable(false);
+                } 
+                // Afficher la deuxième lettre choisie aléatoirement si applicable
+                else if (indice != -1 && j == indice) {
+                    textField.setText(String.valueOf(SECOND_LETTER));
                     textField.setEditable(false);
                 }
 
@@ -144,14 +172,13 @@ public class MotusFrame {
             }
         }
 
-        // Activer le focus pour le premier champ de saisie
+        // Activer le focus pour le premier champ de saisie éditable
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 textFields[0][1].requestFocusInWindow();
             }
         });
     }
-
 
 
     private JPanel createKeyboardPanel() {
