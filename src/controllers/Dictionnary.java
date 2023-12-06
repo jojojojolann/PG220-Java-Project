@@ -1,13 +1,14 @@
 package controllers;
 
 import java.io.FileInputStream;
+import graphics.MotusFrame;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Dictionnary {
-	ArrayList<String> dico;
+	public ArrayList<String> dico;
 	int min;
 	int max;
 	
@@ -67,7 +68,7 @@ public class Dictionnary {
 		return max;
 	}
 	
-	public int size_choice(int min, int max) {
+	public int size_choice() {
 		int indice = 0;
 		Scanner sc = new Scanner(System.in);
 
