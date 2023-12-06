@@ -9,9 +9,10 @@ public class Matrice {
 	private final int wordLen;
 	
 	// Constructor
-	public Matrice(int maxTry, int wordLen) {
+	public Matrice(int maxTry, int wordLen, String solution) {
 		this.maxTry = maxTry;
         this.wordLen = wordLen;
+        this.Solution = solution;
         matrice = new char[maxTry][wordLen];
         setIdxRow(0);
 	}
@@ -40,13 +41,13 @@ public class Matrice {
     	
     	for (int i = 0; i < word.length(); i++) {
     		if (word.charAt(i) == Solution.charAt(i)) { // Correct + Good place
-    			result.append("A ");
+    			result.append("A");
     		}
-    		else if (Solution.indexOf(word.charAt(i)) == -1) { // Correct + Bad place
-    			result.append("B ");
+    		else if (Solution.indexOf(word.charAt(i)) >= 0) { // Correct + Bad place
+    			result.append("B");
     		}
     		else { // Incorrect
-    			result.append("C ");
+    			result.append("C");
     		}
     	}
     	return result.toString();
@@ -54,16 +55,18 @@ public class Matrice {
     
     public void addTry(String word, int idxRow) {
     	String Test = isValid(word);
-        if (!((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry))) {
-            for (int i = 0; i < wordLen; i++) {
+        if ((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry)) {
+            for (int i = 0; i < wordLen-1; i++) {
                 matrice[this.idxRow][i] = word.charAt(i);
             }
             idxRow++;
+            System.out.println("idxRow = " + idxRow);
+            System.out.println("Word : " + word);
             
             // End of game de
             if (word.equals(Solution)) {
                 System.out.println("Félicitations ! Vous avez trouvé le mot !");
-            } else if (this.idxRow == maxTry) {
+            } else if ((this.idxRow == maxTry-1) && (!(word.equals(Solution)))) {
             	System.out.println("Game Over. Vous avez épuisé toutes vos tentatives.");
                 System.out.println("Le mot correct était : " + Solution);
             }

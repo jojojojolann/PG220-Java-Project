@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Random;
 
 import controllers.Dictionnary;
+import controllers.Matrice;
 
 public class MotusFrame {
 
@@ -27,6 +28,7 @@ public class MotusFrame {
     private int elapsedTime;
     private Map<Character, JButton> keyboardButtons;
     private Dictionnary dictionnary;
+    private Matrice matrice;
 
     public static final int MIN_GRID_SIZE = 7;
     public static final int MAX_GRID_SIZE = 15;
@@ -75,6 +77,7 @@ public class MotusFrame {
                 selectedWord = dictionnary.motaleatoire(size);
                 selectedWord = selectedWord.toUpperCase();
                 INITIAL_LETTER = selectedWord.charAt(0);
+                matrice = new Matrice(size, selectedWord.length(), selectedWord);
 
                 // Choix aléatoire de la deuxième lettre si "Oui" est sélectionné
                 if (yesButton.isSelected()) {
@@ -84,7 +87,7 @@ public class MotusFrame {
                 } else {
                     indice = -1; // Valeur pour indiquer que la deuxième lettre ne doit pas être affichée
                 }
-
+                
                 createAndShowGameGUI();
                 initialFrame.dispose();
             }
@@ -216,12 +219,39 @@ public class MotusFrame {
                     source.setText(String.valueOf(Character.toUpperCase(e.getKeyChar())));
                     moveFocusRight(source);
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                	submitWord(source);
                     moveFocusDown(source);
                 } else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                     handleBackspace(source);
                 }
             }
         };
+    }
+    
+    private void submitWord(JTextField source) {
+        int row = getCurrentRow(source);
+        String word = getWordFromRow(row);
+        matrice.addTry(word,row);
+        colorRow(row);
+    }
+
+    private int getCurrentRow(JTextField source) {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (textFields[row][col] == source) {
+                    return row;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private String getWordFromRow(int rowIndex) {
+        StringBuilder sb = new StringBuilder();
+        for (int j = 0; j < size; j++) {
+            sb.append(textFields[rowIndex][j].getText());
+        }
+        return sb.toString();
     }
 
     private void moveFocusRight(JTextField currentField) {
@@ -283,9 +313,23 @@ public class MotusFrame {
     }
 
     private void colorRow(int rowIndex) {
-        Color completedRowColor = new Color(200, 200, 200);
-        for (int j = 0; j < size; j++) {
-            textFields[rowIndex][j].setBackground(completedRowColor);
+        String result = matrice.isValid(getWordFromRow(rowIndex)); // Utilise isValid pour obtenir le résultat
+        
+        for (int col = 0; col < size; col++) {
+            JTextField textField = textFields[rowIndex][col];
+            char status = result.charAt(col); // Obtient le statut de chaque lettre
+    
+            switch (status) {
+                case 'A': // Correcte et bien placée
+                    textField.setBackground(Color.RED);
+                    break;
+                case 'B': // Présente mais mal placée
+                    textField.setBackground(Color.ORANGE);
+                    break;
+                case 'C': // Incorrecte
+                    textField.setBackground(Color.WHITE);
+                    break;
+            }
         }
     }
 
