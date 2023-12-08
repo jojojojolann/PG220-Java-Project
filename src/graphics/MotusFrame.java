@@ -245,10 +245,11 @@ public class MotusFrame {
         matrice.addTry(word, row);
         colorRow(row);
 
-        // Vérifiez si le mot est correctement deviné
         if (word.equals(selectedWord)) {
+        	timer.stop();
             showVictoryDialog();
-        } else if (row == size - 1 && !word.equals(selectedWord)) {
+        } else if (matrice.getIdxRow() >= matrice.getMaxTry() - 1 && !word.equals(selectedWord)) {
+        	timer.stop();
             showEndGameDialog("Nombre d'essais épuisé");
         }
     }
@@ -335,6 +336,7 @@ public class MotusFrame {
 
     private void colorRow(int rowIndex) {
         String result = matrice.isValid(getWordFromRow(rowIndex)); // Utilise isValid pour obtenir le résultat
+        
         
         for (int col = 0; col < size; col++) {
             JTextField textField = textFields[rowIndex][col];
