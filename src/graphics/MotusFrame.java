@@ -242,8 +242,15 @@ public class MotusFrame {
     private void submitWord(JTextField source) {
         int row = getCurrentRow(source);
         String word = getWordFromRow(row);
-        matrice.addTry(word,row);
+        matrice.addTry(word, row);
         colorRow(row);
+
+        // Vérifiez si le mot est correctement deviné
+        if (word.equals(selectedWord)) {
+            showVictoryDialog();
+        } else if (row == size - 1 && !word.equals(selectedWord)) {
+            showEndGameDialog("Nombre d'essais épuisé");
+        }
     }
 
     private int getCurrentRow(JTextField source) {
@@ -359,8 +366,8 @@ public class MotusFrame {
     }
 
     private void setupControlPanel(JPanel controlPanel) {
-    	elapsedTime = 5; // 5 minutes
-        timerLabel = new JLabel("Temps restant: 300 s");
+        elapsedTime = 300; // 5 minutes
+        timerLabel = new JLabel("Temps restant: " + elapsedTime + " s");
         timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -369,25 +376,7 @@ public class MotusFrame {
 
                 if (elapsedTime <= 0) {
                     timer.stop();
-                    // Afficher la boîte de dialogue à la fin du timer
-                    int choice = JOptionPane.showOptionDialog(
-                        gameFrame,
-                        "Le temps est écoulé ! Voulez-vous recommencer ou quitter ?",
-                        "Temps écoulé",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[]{"Recommencer", "Quitter"}, // Options
-                        "Recommencer"
-                    );
-
-                    if (choice == JOptionPane.YES_OPTION) {
-                        // Si l'utilisateur choisit de recommencer
-                        restartGame();
-                    } else {
-                        // Si l'utilisateur choisit de quitter
-                        System.exit(0);
-                    }
+                    showEndGameDialog("Le temps est écoulé !");
                 }
             }
         });
@@ -419,6 +408,51 @@ public class MotusFrame {
         gameFrame.dispose();
         createInitialFrame();
     }
+    
+    private void showEndGameDialog(String endReason) {
+        String message = endReason + "\nLe mot à deviner était : " + selectedWord 
+                        + "\nVoulez-vous recommencer ou quitter ?";
+        
+        int choice = JOptionPane.showOptionDialog(
+            gameFrame,
+            message,
+            "Jeu terminé",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new String[]{"Recommencer", "Quitter"}, // Options
+            "Recommencer"
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            restartGame();
+        } else {
+            System.exit(0);
+        }
+    }
+    
+    private void showVictoryDialog() {
+        String message = "Félicitations !\nVous avez trouvé le mot : " + selectedWord 
+                        + "\nVoulez-vous recommencer ou quitter ?";
+
+        int choice = JOptionPane.showOptionDialog(
+            gameFrame,
+            message,
+            "Victoire !",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new String[]{"Recommencer", "Quitter"}, // Options
+            "Recommencer"
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            restartGame();
+        } else {
+            System.exit(0);
+        }
+    }
+
 
     public static void main(String[] args) {
     	MotusFrame h = new MotusFrame();
