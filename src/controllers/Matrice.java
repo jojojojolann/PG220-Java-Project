@@ -64,14 +64,6 @@ public class Matrice {
                 matrice[this.idxRow][i] = word.charAt(i);
             }
             idxRow++;
-            
-        } // End of game de
-        else if ((Test.contains("C") || (Test.contains("B"))) && (idxRow == maxTry-1)) {
-        	System.out.println("Game Over. Vous avez épuisé toutes vos tentatives.");
-            System.out.println("Le mot correct était : " + Solution);
-        }
-        else {
-        	System.out.println("Félicitations ! Vous avez trouvé le mot !");
-        }
+        } 
     }
 }
