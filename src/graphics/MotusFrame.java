@@ -359,13 +359,36 @@ public class MotusFrame {
     }
 
     private void setupControlPanel(JPanel controlPanel) {
-        elapsedTime = 0;
-        timerLabel = new JLabel("Temps: 0 s");
+    	elapsedTime = 5; // 5 minutes
+        timerLabel = new JLabel("Temps restant: 300 s");
         timer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                elapsedTime++;
-                timerLabel.setText("Temps: " + elapsedTime + " s");
+                elapsedTime--;
+                timerLabel.setText("Temps restant: " + elapsedTime + " s");
+
+                if (elapsedTime <= 0) {
+                    timer.stop();
+                    // Afficher la boîte de dialogue à la fin du timer
+                    int choice = JOptionPane.showOptionDialog(
+                        gameFrame,
+                        "Le temps est écoulé ! Voulez-vous recommencer ou quitter ?",
+                        "Temps écoulé",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        new String[]{"Recommencer", "Quitter"}, // Options
+                        "Recommencer"
+                    );
+
+                    if (choice == JOptionPane.YES_OPTION) {
+                        // Si l'utilisateur choisit de recommencer
+                        restartGame();
+                    } else {
+                        // Si l'utilisateur choisit de quitter
+                        System.exit(0);
+                    }
+                }
             }
         });
         timer.start();
