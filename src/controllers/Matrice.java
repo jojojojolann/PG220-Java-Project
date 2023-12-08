@@ -64,8 +64,6 @@ public class Matrice {
                 matrice[this.idxRow][i] = word.charAt(i);
             }
             idxRow++;
-            System.out.println("idxRow = " + idxRow);
-            System.out.println("Word : " + word);
             
         } // End of game de
         else if ((Test.contains("C") || (Test.contains("B"))) && (idxRow == maxTry-1)) {
