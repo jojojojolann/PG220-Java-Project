@@ -36,6 +36,10 @@ public class Matrice {
 	public String getSolution() {
 		return Solution;
 	}
+	
+	public char getCharAt(int row, int col) {
+		return matrice[row][col];
+	}
 
 	// Methods
 	public void display() {
@@ -68,7 +72,6 @@ public class Matrice {
 						if (search == currentChar && result.charAt(j) == 'B') {
 							result.deleteCharAt(j);
 							result.insert(j, 'C');
-							System.out.println("Le");
 							break;
 						}
 					}
