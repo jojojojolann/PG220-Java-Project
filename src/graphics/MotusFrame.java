@@ -8,10 +8,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.io.File;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -38,6 +38,9 @@ public class MotusFrame {
 	private static final Color DARK_BACK = new Color(45, 45, 45);
 	private static final Color DARK_TEXT = Color.WHITE;
 	private boolean isDarkMode = false;
+	private Clip backgroundMusicClip;
+	private JButton soundToggleButton;
+	private JTextField focusedTextField;
 
 	public static final int MIN_GRID_SIZE = 7;
 	public static final int MAX_GRID_SIZE = 15;
@@ -48,95 +51,121 @@ public class MotusFrame {
 
 	public MotusFrame() {
 		dictionnary = new Dictionnary();
-		createWelcomeFrame();
+		showloadingScreen();
 	}
 
-	private void createWelcomeFrame() {
-        JFrame welcomeFrame = new JFrame("Bienvenue dans Motus");
-        welcomeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        welcomeFrame.setLayout(new BorderLayout());
-		try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("icone.png"));
-            Image image = icon.getImage();
-            welcomeFrame.setIconImage(image);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	private void showloadingScreen() {
+        final JWindow loadingScreen = new JWindow();
+        ImageIcon loadingImage = new ImageIcon(getClass().getResource("icone.png")); // Adjust the path to your image
+        JLabel loadingLabel = new JLabel(loadingImage);
 
-        // Panneau pour le contenu central
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+        final JProgressBar progressBar = new JProgressBar();
+        progressBar.setStringPainted(true);
+        progressBar.setString("Chargement du jeu...");
+        progressBar.setForeground(Color.ORANGE);
+        progressBar.setBackground(Color.BLACK);
 
-        // Étiquette de bienvenue centrée
-        JLabel welcomeLabel = new JLabel("<html><center>Bienvenue dans le jeu Motus!<br>Choisissez votre mode de jeu et votre langue:</center></html>");
-        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel contentPane = new JPanel(new BorderLayout());
+        contentPane.add(loadingLabel, BorderLayout.CENTER);
+        contentPane.add(progressBar, BorderLayout.SOUTH);
+        contentPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-        // Panneau pour les boutons de mode
-        JPanel modeButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JCheckBox classicModeCheckbox = new JCheckBox("Mode Classique");
-        JCheckBox customModeCheckbox = new JCheckBox("Mode Personnalisé");
+        loadingScreen.setContentPane(contentPane);
+        loadingScreen.pack();
 
-        // Groupe de boutons pour les checkboxes
-        ButtonGroup modeGroup = new ButtonGroup();
-        modeGroup.add(classicModeCheckbox);
-        modeGroup.add(customModeCheckbox);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        loadingScreen.setLocation(
+                screenSize.width / 2 - loadingScreen.getSize().width / 2,
+                screenSize.height / 2 - loadingScreen.getSize().height / 2
+        );
 
-        // Ajouter les checkboxes au panneau
-        modeButtonPanel.add(classicModeCheckbox);
-        modeButtonPanel.add(customModeCheckbox);
+        loadingScreen.setVisible(true);
 
-        // Panneau pour les boutons de langue
-        JPanel languageButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton frenchButton = new JButton("Français");
-        JButton englishButton = new JButton("English");
-        JButton spanishButton = new JButton("Español");
-
-        // Désactiver les boutons de langue par défaut
-        frenchButton.setEnabled(false);
-        englishButton.setEnabled(false);
-        spanishButton.setEnabled(false);
-
-        // Écouteurs pour les checkboxes
-        ActionListener modeCheckboxListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean enableLanguageButtons = classicModeCheckbox.isSelected() || customModeCheckbox.isSelected();
-                frenchButton.setEnabled(enableLanguageButtons);
-                englishButton.setEnabled(enableLanguageButtons);
-                spanishButton.setEnabled(enableLanguageButtons);
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i <= 100; i++) {
+                    progressBar.setValue(i);
+                    try {
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                loadingScreen.dispose();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        createWelcomeFrame();
+                    }
+                });
             }
-        };
-
-        classicModeCheckbox.addActionListener(modeCheckboxListener);
-        customModeCheckbox.addActionListener(modeCheckboxListener);
-
-        // Ajouter les écouteurs d'événements pour les boutons de langue
-        frenchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                welcomeFrame.dispose();
-                createInitialFrame(); // Lance le jeu en français
-            }
-        });
-
-        // Ajouter les boutons de langue au panneau
-        languageButtonPanel.add(frenchButton);
-        languageButtonPanel.add(englishButton);
-        languageButtonPanel.add(spanishButton);
-
-        // Ajout des composants au panneau central
-        centerPanel.add(welcomeLabel);
-        centerPanel.add(modeButtonPanel);
-        centerPanel.add(languageButtonPanel);
-
-        // Ajout du panneau central à la fenêtre
-        welcomeFrame.add(centerPanel, BorderLayout.CENTER);
-
-        welcomeFrame.pack();
-        welcomeFrame.setLocationRelativeTo(null);
-        welcomeFrame.setVisible(true);
+        }).start();
     }
 
+	private void createWelcomeFrame() {
+		JFrame welcomeFrame = new JFrame("Bienvenue dans Motus");
+		welcomeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		welcomeFrame.setLayout(new BorderLayout());
+	
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+	
+		JLabel welcomeLabel = new JLabel("<html><center>Bienvenue dans le jeu Motus!<br>Choisissez votre mode de jeu et votre langue:</center></html>");
+		welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+	
+		JPanel modeButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JCheckBox classicModeCheckbox = new JCheckBox("Mode Classique");
+		JCheckBox customModeCheckbox = new JCheckBox("Mode Personnalisé");
+	
+		ButtonGroup modeGroup = new ButtonGroup();
+		modeGroup.add(classicModeCheckbox);
+		modeGroup.add(customModeCheckbox);
+	
+		modeButtonPanel.add(classicModeCheckbox);
+		modeButtonPanel.add(customModeCheckbox);
+	
+		JPanel languageButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JButton frenchButton = new JButton(new ImageIcon(new ImageIcon(getClass().getResource("france.png")).getImage().getScaledInstance(50, 40, Image.SCALE_SMOOTH)));
+		JButton englishButton = new JButton(new ImageIcon(new ImageIcon(getClass().getResource("royaume-uni.png")).getImage().getScaledInstance(50, 40, Image.SCALE_SMOOTH)));
+		JButton spanishButton = new JButton(new ImageIcon(new ImageIcon(getClass().getResource("espagne.png")).getImage().getScaledInstance(50, 40, Image.SCALE_SMOOTH)));
+	
+		frenchButton.setEnabled(false);
+		englishButton.setEnabled(false);
+		spanishButton.setEnabled(false);
+	
+		ActionListener modeCheckboxListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean enableLanguageButtons = modeGroup.getSelection() != null;
+				frenchButton.setEnabled(enableLanguageButtons);
+				englishButton.setEnabled(enableLanguageButtons);
+				spanishButton.setEnabled(enableLanguageButtons);
+			}
+		};
+	
+		classicModeCheckbox.addActionListener(modeCheckboxListener);
+		customModeCheckbox.addActionListener(modeCheckboxListener);
+	
+		frenchButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				welcomeFrame.dispose();
+				createInitialFrame();
+			}
+		});
+		
+		languageButtonPanel.add(frenchButton);
+		languageButtonPanel.add(englishButton);
+		languageButtonPanel.add(spanishButton);
+	
+		centerPanel.add(welcomeLabel);
+		centerPanel.add(modeButtonPanel);
+		centerPanel.add(languageButtonPanel);
+	
+		welcomeFrame.add(centerPanel, BorderLayout.CENTER);
+	
+		welcomeFrame.pack();
+		welcomeFrame.setLocationRelativeTo(null);
+		welcomeFrame.setVisible(true);
+	}
+		
 	class LanguageItem {
         private ImageIcon flagIcon;
         private String language;
@@ -179,7 +208,7 @@ public class MotusFrame {
         }
 		initialFrame.setResizable(false);
 		initialFrame.setPreferredSize(new Dimension(400, 200));
-		// Ligne 1: Choix de la taille du mot
+
 		JPanel sizePanel = new JPanel(new FlowLayout());
 		Integer[] sizeOptions = new Integer[MAX_GRID_SIZE - MIN_GRID_SIZE + 1];
 		for (int i = 0; i < sizeOptions.length; i++) {
@@ -189,7 +218,6 @@ public class MotusFrame {
 		sizePanel.add(new JLabel("Taille du mot :"));
 		sizePanel.add(gridSizes);
 
-		// Ligne 2: Choix de l'affichage de la deuxième lettre aléatoire
 		JPanel letterChoicePanel = new JPanel(new FlowLayout());
 		JRadioButton yesButton = new JRadioButton("Oui", true);
 		JRadioButton noButton = new JRadioButton("Non");
@@ -200,7 +228,6 @@ public class MotusFrame {
 		letterChoicePanel.add(yesButton);
 		letterChoicePanel.add(noButton);
 
-		// Ligne 4 : Bouton de Dark Mode
 		JPanel darkModePanel = new JPanel(new FlowLayout());
 		JRadioButton darkYes = new JRadioButton("Oui");
 		JRadioButton darkNo = new JRadioButton("Non");
@@ -226,7 +253,6 @@ public class MotusFrame {
 		});
 
 
-		// Ligne 3: Bouton de démarrage du jeu
 		JPanel startGamePanel = new JPanel(new FlowLayout());
 		JButton submitButton = new JButton("Start Game");
 		submitButton.setBackground(DARK_BACK);
@@ -240,13 +266,12 @@ public class MotusFrame {
 				INITIAL_LETTER = selectedWord.charAt(0);
 				matrice = new Matrice(size, selectedWord.length(), selectedWord);
 
-				// Choix aléatoire de la deuxième lettre si "Oui" est sélectionné
 				if (yesButton.isSelected()) {
 					indice = new Random().nextInt(size-1);
 					indice += 1;
 					SECOND_LETTER = selectedWord.charAt(indice);
 				} else {
-					indice = -1; // Valeur pour indiquer que la deuxième lettre ne doit pas être affichée
+					indice = -1;
 				}
 
 				createAndShowGameGUI();
@@ -255,7 +280,6 @@ public class MotusFrame {
 		});
 		startGamePanel.add(submitButton);
 
-		// Ajout des panneaux à la fenêtre principale
 		initialFrame.add(sizePanel);
 		initialFrame.add(letterChoicePanel);
 		initialFrame.add(darkModePanel);
@@ -272,7 +296,6 @@ public class MotusFrame {
 
 		initialFrame.getContentPane().setBackground(bgColor);
 	}
-
 
 	private void createAndShowGameGUI() {
 		gameFrame = new JFrame("Motus Game");
@@ -336,7 +359,6 @@ public class MotusFrame {
 				}
 				textField.addKeyListener(keyAdapter);
 
-				// Empêcher la sélection de texte avec la souris
 				textField.addMouseListener(new MouseAdapter() {
 					public void mousePressed(MouseEvent e) {
 						textField.setFocusable(false);
@@ -346,13 +368,11 @@ public class MotusFrame {
 					}
 				});
 
-				// Afficher la première lettre dans la première colonne
 				if (j == 0) {
 					textField.setText(String.valueOf(INITIAL_LETTER));
 					textField.setEditable(false);
 					textField.setBackground(new Color(0, 123, 167));
 				} 
-				// Afficher la deuxième lettre choisie aléatoirement si applicable
 				else if (indice != -1 && j == indice) {
 					textField.setText(String.valueOf(SECOND_LETTER));
 					textField.setEditable(false);
@@ -363,14 +383,12 @@ public class MotusFrame {
 			}
 		}
 
-		// Activer le focus pour le premier champ de saisie éditable
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				textFields[0][1].requestFocusInWindow();
 			}
 		});
 	}
-
 
 	private JPanel createKeyboardPanel() {
 		String[] keys = {"AZERTYUIOP", "QSDFGHJKLM", "WXCVBN"};
@@ -404,27 +422,30 @@ public class MotusFrame {
 			public void keyPressed(KeyEvent e) {
 				JTextField source = (JTextField) e.getSource();
 				if (Character.isLetter(e.getKeyChar())) {
-					source.setText(String.valueOf(Character.toUpperCase(e.getKeyChar())));
-					animateLetterPop(source);
-					moveFocusRight(source);
+				  source.setText(String.valueOf(Character.toUpperCase(e.getKeyChar())));
+				  animateLetterPop(source);
+				  moveFocusRight(source);
 				} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if (isRowComplete(getCurrentRow(source))) {
-						submitWord(source);
-						moveFocusDown(source);
-					}
+				  if (isRowComplete(getCurrentRow(source)) && inDico(getWordFromRow(getCurrentRow(source)))) {
+					submitWord(source);
+					moveFocusDown(source);
+				  } else if (isRowComplete(getCurrentRow(source)) && !inDico(getWordFromRow(getCurrentRow(source)))) {
+					System.out.println("Le mot n'est pas dans le dictionnaire.");
+				  }
+		
 				} else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-					handleBackspace(source);
+				  handleBackspace(source);
 				}
-			}
+			  }
 		};
 	}
 
 	private void animateLetterPop(JTextField textField) {
-		final Color canardColor = new Color(0, 123, 167); // Couleur bleu canard pour le fond
+		final Color canardColor = new Color(0, 123, 167);
 		final int initialFontSize = 20;
 		final int targetFontSize = 30;
 		final int animationSteps = 5;
-		final int delay = 50; // Délai en millisecondes entre les étapes de l'animation
+		final int delay = 50;
 	
 		Timer animationTimer = new Timer(delay, new ActionListener() {
 			private int currentStep = 0;
@@ -439,7 +460,7 @@ public class MotusFrame {
 					currentStep++;
 				} else {
 					textField.setFont(textField.getFont().deriveFont((float) initialFontSize));
-					((Timer) e.getSource()).stop(); // Arrête l'animation
+					((Timer) e.getSource()).stop();
 				}
 			}
 		});
@@ -456,22 +477,23 @@ public class MotusFrame {
 	}
 
 	private void submitWord(JTextField source) {
-        int row = getCurrentRow(source);
-        String word = getWordFromRow(row);
-        matrice.addTry(word, row);
-        colorRow(row);
-
-        // Vérification si le mot soumis est correct
-        if (word.equals(selectedWord)) {
-            timer.stop();
-            showVictoryDialog();
-        } 
-        // Vérification si c'est le dernier essai et que le mot est incorrect
-        else if (row == size - 1 || matrice.getIdxRow() >= matrice.getMaxTry() - 1) {
-            timer.stop();
-            showEndGameDialog("Nombre d'essais épuisé ou mot incorrect");
-        }
-    }
+		int row = getCurrentRow(source);
+		String word = getWordFromRow(row);
+	  
+		matrice.addTry(word, row);
+		colorRow(row);
+	  
+		// Vérification si le mot soumis est correct
+		if (word.equals(selectedWord)) {
+		  timer.stop();
+		  showVictoryDialog();
+		} 
+		// Vérification si c'est le dernier essai et que le mot est incorrect
+		else if (row == size - 1 || matrice.getIdxRow() >= matrice.getMaxTry() - 1) {
+		  timer.stop();
+		  showEndGameDialog("Nombre d'essais épuisé ou mot incorrect");
+		}
+	  }
 
 	private int getCurrentRow(JTextField source) {
 		for (int row = 0; row < size; row++) {
@@ -506,7 +528,6 @@ public class MotusFrame {
 	private void moveFocusDown(JTextField currentField) {
         int currentRow = getCurrentRow(currentField);
 
-        // Vérifie si tous les champs de la ligne actuelle sont remplis
         boolean allFilled = true;
         for (int j = 1; j < size; j++) {
             if (textFields[currentRow][j].getText().trim().isEmpty()) {
@@ -515,15 +536,12 @@ public class MotusFrame {
             }
         }
 
-        // Si tous les champs sont remplis
         if (allFilled) {
-            // Si ce n'est pas la dernière ligne, déplace le focus vers le bas
             if (currentRow < size - 1) {
                 colorRow(currentRow);
                 updateKeyboard(currentRow);
                 textFields[currentRow + 1][1].requestFocus();
             } else {
-                // Pour la dernière ligne, soumettre le mot et ne pas déplacer le focus
                 submitWord(currentField);
             }
         }
@@ -547,7 +565,7 @@ public class MotusFrame {
 	
 		if (col > 1) {
 			textFields[row][col - 1].requestFocus();
-			animateLetterBackspace(textFields[row][col - 1]); // Animer lors du backspace
+			animateLetterBackspace(textFields[row][col - 1]);
 		}
 	}
 	
@@ -574,7 +592,7 @@ public class MotusFrame {
 					currentStep--;
 				} else {
 					textField.setFont(textField.getFont().deriveFont((float) targetFontSize));
-					((Timer) e.getSource()).stop(); // Arrête l'animation
+					((Timer) e.getSource()).stop();
 				}
 			}
 		});
@@ -582,11 +600,11 @@ public class MotusFrame {
 	}
 
 	private void colorRow(int rowIndex) {
-	    String result = matrice.isValid(getWordFromRow(rowIndex)); // Utilise isValid pour obtenir le résultat
+	    String result = matrice.isValid(getWordFromRow(rowIndex));
 
 	    for (int col = 0; col < size; col++) {
 	        JTextField textField = textFields[rowIndex][col];
-	        char status = result.charAt(col); // Obtient le statut de chaque lettre
+	        char status = result.charAt(col);
 
 	        switch (status) {
 	            case 'A': // Correcte et bien placée
@@ -607,7 +625,6 @@ public class MotusFrame {
 	        }
 	    }
 	}
-
 
 	private void updateKeyboard(int currentRow) {
 		String word = getWordFromRow(currentRow);
@@ -633,7 +650,6 @@ public class MotusFrame {
 		}
 	}
 
-
 	private void setupControlPanel(JPanel controlPanel) {
 		elapsedTime = 300; // 5 minutes
 		timerLabel = new JLabel("Temps restant: " + elapsedTime + " s");
@@ -642,7 +658,7 @@ public class MotusFrame {
 			public void actionPerformed(ActionEvent e) {
 				elapsedTime--;
 				timerLabel.setText("Temps restant: " + elapsedTime + " s");
-
+	
 				if (elapsedTime <= 0) {
 					timer.stop();
 					showEndGameDialog("Le temps est écoulé !");
@@ -650,32 +666,43 @@ public class MotusFrame {
 			}
 		});
 		timer.start();
-
+	
 		JButton restartButton = new JButton("Recommencer");
-		restartButton.setBackground(DARK_BACK);
-		restartButton.setForeground(Color.WHITE);
-		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
 		restartButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				restartGame();
 			}
 		});
-
+	
 		JButton quitButton = new JButton("Quitter");
-		quitButton.setBackground(DARK_BACK);
-		quitButton.setForeground(Color.WHITE);
-		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
 		quitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-
+	
+		soundToggleButton = new JButton("Couper le son");
+		soundToggleButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (backgroundMusicClip.isRunning()) {
+					backgroundMusicClip.stop();
+					soundToggleButton.setText("Activer le son");
+				} else {
+					backgroundMusicClip.start();
+					soundToggleButton.setText("Couper le son");
+				}
+				if (focusedTextField != null) {
+					focusedTextField.requestFocusInWindow();
+				}
+			}
+		});
+	
 		controlPanel.add(timerLabel);
 		controlPanel.add(restartButton);
 		controlPanel.add(quitButton);
+		controlPanel.add(soundToggleButton);
 	}
 
 	private void restartGame() {
@@ -766,19 +793,25 @@ public class MotusFrame {
     }
 	
 	private void playBackgroundMusic() {
-        try {
-            URL musicPath = getClass().getResource("music.wav");
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicPath);
+		try {
+			URL musicPath = getClass().getResource("music.wav");
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicPath);
+	
+			backgroundMusicClip = AudioSystem.getClip();
+			backgroundMusicClip.open(audioInputStream);
+			backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+			e.printStackTrace();
+		}
+	}
 
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-            clip.loop(Clip.LOOP_CONTINUOUSLY); // Jouer en boucle
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
-        }
-    }
+	private boolean inDico(String word) {
+    	ArrayList<String> dico = dictionnary.getdico();
+    	return dico.contains(word.toLowerCase());
+  	}
 
 	@SuppressWarnings("unused")
+
 	public static void main(String[] args) {
 		MotusFrame h = new MotusFrame();
 	}
