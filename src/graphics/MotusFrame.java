@@ -229,7 +229,7 @@ public class MotusFrame {
 		// Ligne 3: Bouton de démarrage du jeu
 		JPanel startGamePanel = new JPanel(new FlowLayout());
 		JButton submitButton = new JButton("Start Game");
-		submitButton.setBackground(new Color(0, 123, 167));
+		submitButton.setBackground(DARK_BACK);
 		submitButton.setForeground(Color.WHITE);
 		submitButton.setFont(new Font("Arial", Font.BOLD, 14));
 		submitButton.addActionListener(new ActionListener() {
@@ -652,7 +652,7 @@ public class MotusFrame {
 		timer.start();
 
 		JButton restartButton = new JButton("Recommencer");
-		restartButton.setBackground(new Color(0, 123, 167));
+		restartButton.setBackground(DARK_BACK);
 		restartButton.setForeground(Color.WHITE);
 		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
 		restartButton.addActionListener(new ActionListener() {
@@ -663,7 +663,7 @@ public class MotusFrame {
 		});
 
 		JButton quitButton = new JButton("Quitter");
-		quitButton.setBackground(new Color(0, 123, 167));
+		quitButton.setBackground(DARK_BACK);
 		quitButton.setForeground(Color.WHITE);
 		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
 		quitButton.addActionListener(new ActionListener() {
@@ -735,7 +735,7 @@ public class MotusFrame {
 
         JPanel buttonPanel = new JPanel();
         JButton restartButton = new JButton("Recommencer");
-		restartButton.setBackground(new Color(0, 123, 167));
+		restartButton.setBackground(DARK_BACK);
 		restartButton.setForeground(Color.WHITE);
 		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
         restartButton.addActionListener(new ActionListener() {
@@ -747,7 +747,7 @@ public class MotusFrame {
         buttonPanel.add(restartButton);
 
         JButton quitButton = new JButton("Quitter");
-		quitButton.setBackground(new Color(0, 123, 167));
+		quitButton.setBackground(DARK_BACK);
 		quitButton.setForeground(Color.WHITE);
 		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
         quitButton.addActionListener(new ActionListener() {
