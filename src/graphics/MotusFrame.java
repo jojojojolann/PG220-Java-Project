@@ -651,7 +651,7 @@ public class MotusFrame {
 	}
 
 	private void setupControlPanel(JPanel controlPanel) {
-		elapsedTime = 300; // 5 minutes
+		elapsedTime = 20*size;
 		timerLabel = new JLabel("Temps restant: " + elapsedTime + " s");
 		timer = new Timer(1000, new ActionListener() {
 			@Override
