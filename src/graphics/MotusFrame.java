@@ -48,14 +48,137 @@ public class MotusFrame {
 
 	public MotusFrame() {
 		dictionnary = new Dictionnary();
-		createInitialFrame();
+		createWelcomeFrame();
 	}
+
+	private void createWelcomeFrame() {
+        JFrame welcomeFrame = new JFrame("Bienvenue dans Motus");
+        welcomeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        welcomeFrame.setLayout(new BorderLayout());
+		try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("icone.png"));
+            Image image = icon.getImage();
+            welcomeFrame.setIconImage(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Panneau pour le contenu central
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+
+        // Étiquette de bienvenue centrée
+        JLabel welcomeLabel = new JLabel("<html><center>Bienvenue dans le jeu Motus!<br>Choisissez votre mode de jeu et votre langue:</center></html>");
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Panneau pour les boutons de mode
+        JPanel modeButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JCheckBox classicModeCheckbox = new JCheckBox("Mode Classique");
+        JCheckBox customModeCheckbox = new JCheckBox("Mode Personnalisé");
+
+        // Groupe de boutons pour les checkboxes
+        ButtonGroup modeGroup = new ButtonGroup();
+        modeGroup.add(classicModeCheckbox);
+        modeGroup.add(customModeCheckbox);
+
+        // Ajouter les checkboxes au panneau
+        modeButtonPanel.add(classicModeCheckbox);
+        modeButtonPanel.add(customModeCheckbox);
+
+        // Panneau pour les boutons de langue
+        JPanel languageButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton frenchButton = new JButton("Français");
+        JButton englishButton = new JButton("English");
+        JButton spanishButton = new JButton("Español");
+
+        // Désactiver les boutons de langue par défaut
+        frenchButton.setEnabled(false);
+        englishButton.setEnabled(false);
+        spanishButton.setEnabled(false);
+
+        // Écouteurs pour les checkboxes
+        ActionListener modeCheckboxListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean enableLanguageButtons = classicModeCheckbox.isSelected() || customModeCheckbox.isSelected();
+                frenchButton.setEnabled(enableLanguageButtons);
+                englishButton.setEnabled(enableLanguageButtons);
+                spanishButton.setEnabled(enableLanguageButtons);
+            }
+        };
+
+        classicModeCheckbox.addActionListener(modeCheckboxListener);
+        customModeCheckbox.addActionListener(modeCheckboxListener);
+
+        // Ajouter les écouteurs d'événements pour les boutons de langue
+        frenchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                welcomeFrame.dispose();
+                createInitialFrame(); // Lance le jeu en français
+            }
+        });
+
+        // Ajouter les boutons de langue au panneau
+        languageButtonPanel.add(frenchButton);
+        languageButtonPanel.add(englishButton);
+        languageButtonPanel.add(spanishButton);
+
+        // Ajout des composants au panneau central
+        centerPanel.add(welcomeLabel);
+        centerPanel.add(modeButtonPanel);
+        centerPanel.add(languageButtonPanel);
+
+        // Ajout du panneau central à la fenêtre
+        welcomeFrame.add(centerPanel, BorderLayout.CENTER);
+
+        welcomeFrame.pack();
+        welcomeFrame.setLocationRelativeTo(null);
+        welcomeFrame.setVisible(true);
+    }
+
+	class LanguageItem {
+        private ImageIcon flagIcon;
+        private String language;
+
+        public LanguageItem(ImageIcon flagIcon, String language) {
+            this.flagIcon = flagIcon;
+            this.language = language;
+        }
+
+        public ImageIcon getFlagIcon() {
+            return flagIcon;
+        }
+
+        public String getLanguage() {
+            return language;
+        }
+    }
+
+	class LanguageRenderer extends JLabel implements ListCellRenderer<LanguageItem> {
+        @Override
+        public Component getListCellRendererComponent(JList<? extends LanguageItem> list, LanguageItem value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (value != null) {
+                setText(value.getLanguage());
+                setIcon(value.getFlagIcon());
+            }
+            return this;
+        }
+    }
 
 	private void createInitialFrame() {
 		initialFrame = new JFrame("Select Grid Size");
 		initialFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		initialFrame.setLayout(new BoxLayout(initialFrame.getContentPane(), BoxLayout.PAGE_AXIS));
-
+		try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("icone.png"));
+            Image image = icon.getImage();
+            initialFrame.setIconImage(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+		initialFrame.setResizable(false);
+		initialFrame.setPreferredSize(new Dimension(400, 200));
 		// Ligne 1: Choix de la taille du mot
 		JPanel sizePanel = new JPanel(new FlowLayout());
 		Integer[] sizeOptions = new Integer[MAX_GRID_SIZE - MIN_GRID_SIZE + 1];
@@ -106,6 +229,9 @@ public class MotusFrame {
 		// Ligne 3: Bouton de démarrage du jeu
 		JPanel startGamePanel = new JPanel(new FlowLayout());
 		JButton submitButton = new JButton("Start Game");
+		submitButton.setBackground(new Color(0, 123, 167));
+		submitButton.setForeground(Color.WHITE);
+		submitButton.setFont(new Font("Arial", Font.BOLD, 14));
 		submitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				size = (int) gridSizes.getSelectedItem();
@@ -152,6 +278,14 @@ public class MotusFrame {
 		gameFrame = new JFrame("Motus Game");
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gameFrame.setLayout(new BorderLayout());
+
+		try {
+			ImageIcon icon = new ImageIcon(getClass().getResource("icone.png"));
+			Image image = icon.getImage();
+			gameFrame.setIconImage(image);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		panel = new JPanel(new GridLayout(size, size));
 		textFields = new JTextField[size][size];
@@ -216,6 +350,7 @@ public class MotusFrame {
 				if (j == 0) {
 					textField.setText(String.valueOf(INITIAL_LETTER));
 					textField.setEditable(false);
+					textField.setBackground(new Color(0, 123, 167));
 				} 
 				// Afficher la deuxième lettre choisie aléatoirement si applicable
 				else if (indice != -1 && j == indice) {
@@ -270,6 +405,7 @@ public class MotusFrame {
 				JTextField source = (JTextField) e.getSource();
 				if (Character.isLetter(e.getKeyChar())) {
 					source.setText(String.valueOf(Character.toUpperCase(e.getKeyChar())));
+					animateLetterPop(source);
 					moveFocusRight(source);
 				} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if (isRowComplete(getCurrentRow(source))) {
@@ -281,6 +417,33 @@ public class MotusFrame {
 				}
 			}
 		};
+	}
+
+	private void animateLetterPop(JTextField textField) {
+		final Color canardColor = new Color(0, 123, 167); // Couleur bleu canard pour le fond
+		final int initialFontSize = 20;
+		final int targetFontSize = 30;
+		final int animationSteps = 5;
+		final int delay = 50; // Délai en millisecondes entre les étapes de l'animation
+	
+		Timer animationTimer = new Timer(delay, new ActionListener() {
+			private int currentStep = 0;
+	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentStep <= animationSteps) {
+					float interpolatedSize = initialFontSize + (targetFontSize - initialFontSize) * ((float) currentStep / animationSteps);
+					Font font = textField.getFont().deriveFont(interpolatedSize);
+					textField.setFont(font);
+					textField.setBackground(canardColor);
+					currentStep++;
+				} else {
+					textField.setFont(textField.getFont().deriveFont((float) initialFontSize));
+					((Timer) e.getSource()).stop(); // Arrête l'animation
+				}
+			}
+		});
+		animationTimer.start();
 	}
 
 	private boolean isRowComplete(int rowIndex) {
@@ -381,10 +544,41 @@ public class MotusFrame {
 			}
 			if (row != -1) break;
 		}
-
-		if (col > 1) { // S'arrête à la deuxième case
+	
+		if (col > 1) {
 			textFields[row][col - 1].requestFocus();
+			animateLetterBackspace(textFields[row][col - 1]); // Animer lors du backspace
 		}
+	}
+	
+	private void animateLetterBackspace(JTextField textField) {
+		final int initialFontSize = 30;
+		final int targetFontSize = 20;
+		final int animationSteps = 5;
+		final int delay = 50;
+	
+		Timer animationTimer = new Timer(delay, new ActionListener() {
+			private int currentStep = animationSteps;
+	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentStep >= 0) {
+					float interpolatedSize = targetFontSize + (initialFontSize - targetFontSize) * ((float) currentStep / animationSteps);
+					Font font = textField.getFont().deriveFont(interpolatedSize);
+					textField.setFont(font);
+					if (!isDarkMode) {
+						textField.setBackground(Color.WHITE);
+					} else {
+						textField.setBackground(DARK_BACK);
+					}
+					currentStep--;
+				} else {
+					textField.setFont(textField.getFont().deriveFont((float) targetFontSize));
+					((Timer) e.getSource()).stop(); // Arrête l'animation
+				}
+			}
+		});
+		animationTimer.start();
 	}
 
 	private void colorRow(int rowIndex) {
@@ -396,7 +590,7 @@ public class MotusFrame {
 
 	        switch (status) {
 	            case 'A': // Correcte et bien placée
-	                textField.setBackground(Color.GREEN);
+	                textField.setBackground(new Color(0, 255, 50));
 	                if (rowIndex < size - 1) {
 	                    // Mettre à jour uniquement la lettre bien placée dans les lignes suivantes
 	                    for (int nextRow = rowIndex + 1; nextRow < size; nextRow++) {
@@ -405,10 +599,10 @@ public class MotusFrame {
 	                }
 	                break;
 	            case 'B': // Présente mais mal placée
-	                textField.setBackground(Color.ORANGE);
+	                textField.setBackground(new Color(255, 165, 0));
 	                break;
 	            case 'C': // Incorrecte
-	                textField.setBackground(Color.RED);
+	                textField.setBackground(new Color(255, 0, 60));
 	                break;
 	        }
 	    }
@@ -426,13 +620,13 @@ public class MotusFrame {
 			if (keyButton != null) {
 				switch (result.charAt(i)) {
 				case 'A': // Lettre correcte et bien placée
-					keyButton.setBackground(Color.GREEN);
+					keyButton.setBackground(new Color(0, 255, 50));
 					break;
 				case 'B': // Lettre correcte mais mal placée
-					keyButton.setBackground(Color.ORANGE);
+					keyButton.setBackground(new Color(255, 165, 0));
 					break;
 				case 'C': // Lettre incorrecte
-					keyButton.setBackground(Color.RED);
+					keyButton.setBackground(new Color(255, 0, 60));
 					break;
 				}
 			}
@@ -458,6 +652,9 @@ public class MotusFrame {
 		timer.start();
 
 		JButton restartButton = new JButton("Recommencer");
+		restartButton.setBackground(new Color(0, 123, 167));
+		restartButton.setForeground(Color.WHITE);
+		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
 		restartButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -466,6 +663,9 @@ public class MotusFrame {
 		});
 
 		JButton quitButton = new JButton("Quitter");
+		quitButton.setBackground(new Color(0, 123, 167));
+		quitButton.setForeground(Color.WHITE);
+		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
 		quitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -535,6 +735,9 @@ public class MotusFrame {
 
         JPanel buttonPanel = new JPanel();
         JButton restartButton = new JButton("Recommencer");
+		restartButton.setBackground(new Color(0, 123, 167));
+		restartButton.setForeground(Color.WHITE);
+		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
         restartButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 restartGame();
@@ -544,6 +747,9 @@ public class MotusFrame {
         buttonPanel.add(restartButton);
 
         JButton quitButton = new JButton("Quitter");
+		quitButton.setBackground(new Color(0, 123, 167));
+		quitButton.setForeground(Color.WHITE);
+		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
         quitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
