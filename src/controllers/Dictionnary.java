@@ -17,6 +17,7 @@ public class Dictionnary {
 		max = maximum();
 	}
 	
+	// Création du dictionnaire
 	public ArrayList<String> creadico(){
 		ArrayList<String> ar = new ArrayList<>();
 		try (FileInputStream fichier = new FileInputStream("Doc.txt"); Scanner scanner = new Scanner(fichier)) {
@@ -29,7 +30,7 @@ public class Dictionnary {
 		return ar;
 	}
 		
-	
+	// Choix aléatoire d'un mot dans le dictionnaire en fonction de la taille
 	public String motaleatoire(int taille) {
         ArrayList<String> list = new ArrayList<>();
         for (String mot : dico) {
@@ -51,6 +52,7 @@ public class Dictionnary {
         return mot;
     }
 	
+	// Calcul du minimum et du maximum de la taille des mots du dictionnaire
 	public int minimum() {
 		int min = 1000;
 		for(int i = 0; i < dico.size(); i++) {
@@ -73,6 +75,7 @@ public class Dictionnary {
 		return max;
 	}
 	
+	// Choix de la taille du mot à deviner
 	public int size_choice(int min, int max) {
 		int indice = 0;
 		Scanner sc = new Scanner(System.in);
@@ -103,6 +106,7 @@ public class Dictionnary {
 		
 	}
 	
+	// Getters
 	public ArrayList<String> getdico() {
 		return dico;
 	}

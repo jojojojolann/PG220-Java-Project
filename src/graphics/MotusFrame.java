@@ -41,6 +41,7 @@ public class MotusFrame {
 	private Clip backgroundMusicClip;
 	private JButton soundToggleButton;
 	private JTextField focusedTextField;
+	private Dimension buttonSize = new Dimension(200, 50);
 
 	public static final int MIN_GRID_SIZE = 7;
 	public static final int MAX_GRID_SIZE = 15;
@@ -54,9 +55,10 @@ public class MotusFrame {
 		showloadingScreen();
 	}
 
+	// Ecran de chargement
 	private void showloadingScreen() {
         final JWindow loadingScreen = new JWindow();
-        ImageIcon loadingImage = new ImageIcon(getClass().getResource("icone.png")); // Adjust the path to your image
+        ImageIcon loadingImage = new ImageIcon(getClass().getResource("icone.png"));
         JLabel loadingLabel = new JLabel(loadingImage);
 
         final JProgressBar progressBar = new JProgressBar();
@@ -101,6 +103,7 @@ public class MotusFrame {
         }).start();
     }
 
+	// Ecran d'accueil avec choix du mode de jeu et de la langue
 	private void createWelcomeFrame() {
 		JFrame welcomeFrame = new JFrame("Bienvenue dans Motus");
 		welcomeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -183,7 +186,8 @@ public class MotusFrame {
             return language;
         }
     }
-
+	
+	// Renderer pour la liste des langues
 	class LanguageRenderer extends JLabel implements ListCellRenderer<LanguageItem> {
         @Override
         public Component getListCellRendererComponent(JList<? extends LanguageItem> list, LanguageItem value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -195,6 +199,7 @@ public class MotusFrame {
         }
     }
 
+	// Ecran de choix de la taille de la grille et de la langue
 	private void createInitialFrame() {
 		initialFrame = new JFrame("Select Grid Size");
 		initialFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -290,6 +295,7 @@ public class MotusFrame {
 		initialFrame.setVisible(true);
 	}
 
+	// Applique le thème sombre ou clair
 	private void applyTheme(boolean darkMode) {
 		isDarkMode = !darkMode;
 		Color bgColor = isDarkMode ? DARK_BACK : Color.WHITE;
@@ -297,6 +303,7 @@ public class MotusFrame {
 		initialFrame.getContentPane().setBackground(bgColor);
 	}
 
+	// Création de la fenêtre de jeu
 	private void createAndShowGameGUI() {
 		gameFrame = new JFrame("Motus Game");
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -319,10 +326,19 @@ public class MotusFrame {
 		setupControlPanel(controlPanel);
 
 		JPanel keyboardPanel = createKeyboardPanel();
+		JLabel redTextLabel = new JLabel("Le mot doit faire " + size + " lettres et soit dans le dictionnaire pour pouvoir valider.");
+		redTextLabel.setForeground(Color.RED);
+		redTextLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
+
+		bottomPanel.add(keyboardPanel);
+		bottomPanel.add(redTextLabel);
 
 		gameFrame.add(panel, BorderLayout.CENTER);
 		gameFrame.add(controlPanel, BorderLayout.EAST);
-		gameFrame.add(keyboardPanel, BorderLayout.SOUTH);
+		gameFrame.add(bottomPanel, BorderLayout.SOUTH);
 
 		int cellSize = 50;
 		int windowWidth = size * cellSize + 200;
@@ -336,6 +352,7 @@ public class MotusFrame {
 		playBackgroundMusic();
 	}
 
+	// Création de la grille de jeu
 	private void setupGrid() {
 		KeyAdapter keyAdapter = createKeyAdapter();
 		Font gridFont = new Font("SansSerif", Font.BOLD, 20);
@@ -390,6 +407,7 @@ public class MotusFrame {
 		});
 	}
 
+	// Création du clavier de la fenêtre de jeu
 	private JPanel createKeyboardPanel() {
 		String[] keys = {"AZERTYUIOP", "QSDFGHJKLM", "WXCVBN"};
 		JPanel keyboardPanel = new JPanel();
@@ -410,6 +428,7 @@ public class MotusFrame {
 		return keyboardPanel;
 	}
 
+	// Création de l'écouteur de touches
 	private KeyAdapter createKeyAdapter() {
 		return new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
@@ -440,6 +459,7 @@ public class MotusFrame {
 		};
 	}
 
+	// Animation des lettres
 	private void animateLetterPop(JTextField textField) {
 		final Color canardColor = new Color(0, 123, 167);
 		final int initialFontSize = 20;
@@ -467,6 +487,7 @@ public class MotusFrame {
 		animationTimer.start();
 	}
 
+	// Vérification si la ligne est complète
 	private boolean isRowComplete(int rowIndex) {
 		for (int col = 0; col < size; col++) {
 			if (textFields[rowIndex][col].getText().isEmpty()) {
@@ -476,6 +497,7 @@ public class MotusFrame {
 		return true;
 	}
 
+	// Soumission du mot
 	private void submitWord(JTextField source) {
 		int row = getCurrentRow(source);
 		String word = getWordFromRow(row);
@@ -495,6 +517,7 @@ public class MotusFrame {
 		}
 	  }
 
+	// Récupération de la ligne courante
 	private int getCurrentRow(JTextField source) {
 		for (int row = 0; row < size; row++) {
 			for (int col = 0; col < size; col++) {
@@ -506,6 +529,7 @@ public class MotusFrame {
 		return -1;
 	}
 
+	// Récupération du mot de la ligne courante
 	private String getWordFromRow(int rowIndex) {
 		StringBuilder sb = new StringBuilder();
 		for (int j = 0; j < size; j++) {
@@ -514,6 +538,7 @@ public class MotusFrame {
 		return sb.toString();
 	}
 
+	// Déplacement du focus vers la droite
 	private void moveFocusRight(JTextField currentField) {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size - 1; j++) {
@@ -525,6 +550,7 @@ public class MotusFrame {
 		}
 	}
 
+	// Déplacement du focus vers le bas
 	private void moveFocusDown(JTextField currentField) {
         int currentRow = getCurrentRow(currentField);
 
@@ -547,6 +573,7 @@ public class MotusFrame {
         }
     }
 
+	// Gestion de la touche backspace
 	private void handleBackspace(JTextField currentField) {
 		int row = -1, col = -1;
 		for (int i = 0; i < size; i++) {
@@ -569,6 +596,7 @@ public class MotusFrame {
 		}
 	}
 	
+	// Animation des lettres lors de la suppression
 	private void animateLetterBackspace(JTextField textField) {
 		final int initialFontSize = 30;
 		final int targetFontSize = 20;
@@ -599,6 +627,7 @@ public class MotusFrame {
 		animationTimer.start();
 	}
 
+	// Coloration de la ligne
 	private void colorRow(int rowIndex) {
 	    String result = matrice.isValid(getWordFromRow(rowIndex));
 
@@ -610,7 +639,6 @@ public class MotusFrame {
 	            case 'A': // Correcte et bien placée
 	                textField.setBackground(new Color(0, 255, 50));
 	                if (rowIndex < size - 1) {
-	                    // Mettre à jour uniquement la lettre bien placée dans les lignes suivantes
 	                    for (int nextRow = rowIndex + 1; nextRow < size; nextRow++) {
 	                        textFields[nextRow][col].setText(String.valueOf(getWordFromRow(rowIndex).charAt(col)));
 	                    }
@@ -626,6 +654,7 @@ public class MotusFrame {
 	    }
 	}
 
+	// Mise à jour du clavier
 	private void updateKeyboard(int currentRow) {
 		String word = getWordFromRow(currentRow);
 		String result = matrice.isValid(word);
@@ -650,6 +679,7 @@ public class MotusFrame {
 		}
 	}
 
+	// Création du panneau de contrôle
 	private void setupControlPanel(JPanel controlPanel) {
 		elapsedTime = 20*size;
 		timerLabel = new JLabel("Temps restant: " + elapsedTime + " s");
@@ -668,6 +698,12 @@ public class MotusFrame {
 		timer.start();
 	
 		JButton restartButton = new JButton("Recommencer");
+		restartButton.setBackground(DARK_BACK);
+		restartButton.setForeground(Color.WHITE);
+		restartButton.setPreferredSize(buttonSize);
+		restartButton.setMinimumSize(buttonSize);
+		restartButton.setMaximumSize(buttonSize);
+		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
 		restartButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -676,6 +712,12 @@ public class MotusFrame {
 		});
 	
 		JButton quitButton = new JButton("Quitter");
+		quitButton.setBackground(DARK_BACK);
+		quitButton.setForeground(Color.WHITE);
+		quitButton.setPreferredSize(buttonSize);
+		quitButton.setMinimumSize(buttonSize);
+		quitButton.setMaximumSize(buttonSize);
+		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
 		quitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -684,6 +726,12 @@ public class MotusFrame {
 		});
 	
 		soundToggleButton = new JButton("Couper le son");
+		soundToggleButton.setBackground(DARK_BACK);
+		soundToggleButton.setForeground(Color.WHITE);
+		soundToggleButton.setPreferredSize(buttonSize);
+		soundToggleButton.setMinimumSize(buttonSize);
+		soundToggleButton.setMaximumSize(buttonSize);
+		soundToggleButton.setFont(new Font("Arial", Font.BOLD, 14));
 		soundToggleButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (backgroundMusicClip.isRunning()) {
@@ -705,12 +753,14 @@ public class MotusFrame {
 		controlPanel.add(soundToggleButton);
 	}
 
+	// Redémarrage du jeu
 	private void restartGame() {
 		timer.stop();
 		gameFrame.dispose();
 		createInitialFrame();
 	}
 
+	// Affichage de la fenêtre de fin de jeu
 	private void showEndGameDialog(String endReason) {
         JDialog endGameDialog = new JDialog(gameFrame, "Jeu terminé", true);
         endGameDialog.setLayout(new BorderLayout());
@@ -725,6 +775,9 @@ public class MotusFrame {
 
         JPanel buttonPanel = new JPanel();
         JButton restartButton = new JButton("Recommencer");
+		restartButton.setBackground(DARK_BACK);
+		restartButton.setForeground(Color.WHITE);
+		restartButton.setFont(new Font("Arial", Font.BOLD, 14));
         restartButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 restartGame();
@@ -734,6 +787,9 @@ public class MotusFrame {
         buttonPanel.add(restartButton);
 
         JButton quitButton = new JButton("Quitter");
+		quitButton.setBackground(DARK_BACK);
+		quitButton.setForeground(Color.WHITE);
+		quitButton.setFont(new Font("Arial", Font.BOLD, 14));
         quitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -748,6 +804,7 @@ public class MotusFrame {
         endGameDialog.setVisible(true);
     }
 
+	// Affichage de la fenêtre de victoire
 	private void showVictoryDialog() {
         JDialog victoryDialog = new JDialog(gameFrame, "Victoire !", true);
         victoryDialog.setLayout(new BorderLayout());
@@ -786,12 +843,12 @@ public class MotusFrame {
 
         victoryDialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Affichage du dialogue
         victoryDialog.pack();
         victoryDialog.setLocationRelativeTo(gameFrame);
         victoryDialog.setVisible(true);
     }
 	
+	// Lecture de la musique de fond
 	private void playBackgroundMusic() {
 		try {
 			URL musicPath = getClass().getResource("music.wav");
@@ -805,14 +862,9 @@ public class MotusFrame {
 		}
 	}
 
+	// Vérification si le mot est dans le dictionnaire
 	private boolean inDico(String word) {
     	ArrayList<String> dico = dictionnary.getdico();
     	return dico.contains(word.toLowerCase());
   	}
-
-	@SuppressWarnings("unused")
-
-	public static void main(String[] args) {
-		MotusFrame h = new MotusFrame();
-	}
 }

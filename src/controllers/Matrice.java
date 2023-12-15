@@ -42,6 +42,7 @@ public class Matrice {
 	}
 
 	// Methods
+	// Affiche la matrice
 	public void display() {
 		for (int i = 0; i < maxTry; i++) {
 			for (int j = 0; j < wordLen; j++) {
@@ -51,6 +52,7 @@ public class Matrice {
 		}
 	}
 
+	// Détermine la validité des lettres soumises par le joueur
 	public String isValid(String word) {
 		StringBuilder result = new StringBuilder();
 		Map<Character, Integer> letterCount = new HashMap<>();
@@ -93,22 +95,23 @@ public class Matrice {
 	return result.toString();
 }
 
-private Map<Character, Integer> getLetterCount(String word) {
-	Map<Character, Integer> letterCount = new HashMap<>();
-	for (char c : word.toCharArray()) {
-		letterCount.put(c, letterCount.getOrDefault(c, 0) + 1);
-	}
-	return letterCount;
-}
-
-
-public void addTry(String word, int idxRow) {
-	String Test = isValid(word);
-	if ((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry-1)) {
-		for (int i = 0; i < wordLen-1; i++) {
-			matrice[this.idxRow][i] = word.charAt(i);
+	// Compte le nombre d'occurrences de chaque lettre dans un mot
+	private Map<Character, Integer> getLetterCount(String word) {
+		Map<Character, Integer> letterCount = new HashMap<>();
+		for (char c : word.toCharArray()) {
+			letterCount.put(c, letterCount.getOrDefault(c, 0) + 1);
 		}
-		idxRow++;
-	} 
-}
+		return letterCount;
+	}
+
+	// Ajoute un essai dans la matrice (une nouvelle ligne)
+	public void addTry(String word, int idxRow) {
+		String Test = isValid(word);
+		if ((Test.contains("C") || (Test.contains("B"))) && (idxRow < maxTry-1)) {
+			for (int i = 0; i < wordLen-1; i++) {
+				matrice[this.idxRow][i] = word.charAt(i);
+			}
+			idxRow++;
+		} 
+	}
 }
